@@ -17,9 +17,9 @@ const userLists: User[] = [
 
 const Users = () => {
   return (
-    <div className="w-[100%] h-[95vh] hidden lg:block rounded-lg">
-      <p className="text-black text-xl font-bold pt-4 pb-4">People</p>
-      <div className="h-[550px] overflow-y-auto scrollbar-medium rounded-lg scrollbar shadow-sm bg-white shadow-[#C4E3F4]">
+    <div className="w-[100%] h-[85vh] hidden lg:block rounded-lg">
+      <p className="text-black text-xl font-bold pt-2 pb-4">People</p>
+      <div className="h-[450px] overflow-y-auto scrollbar-medium rounded-lg scrollbar shadow-sm bg-white shadow-[#C4E3F4]">
         {userLists.map((item) => (
           <div
             key={item?.id}
