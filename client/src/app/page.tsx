@@ -10,7 +10,7 @@ export default function Home() {
       <div className="flex">
       <div className="w-[20%] flex justify-center"><Sidebar/></div>
       <div className="w-[30%] h-[95vh] flex justify-center"><Users/></div>
-      <div className="w-[100%] h-[95vh] flex justify-center"><Chat/></div>
+      <div className="w-[100%] h-[90vh] flex justify-center"><Chat/></div>
      </div>
      </div>
     </div>
