@@ -4,9 +4,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const dbclient_1 = __importDefault(require("./config/dbclient"));
+const express_fileupload_1 = __importDefault(require("express-fileupload"));
+const user_1 = __importDefault(require("./routes/user"));
+const auth_1 = __importDefault(require("./routes/auth"));
+const message_1 = __importDefault(require("./routes/message"));
 const PORT = process.env.PORT || 5000;
 const app = (0, express_1.default)();
+// middleware
+app.use((0, cors_1.default)());
+app.use(express_1.default.json({ limit: "1gb" }));
+app.use((0, express_fileupload_1.default)());
+app.use(express_1.default.urlencoded({ extended: false }));
+app.use("/api/auth", auth_1.default);
+app.use("/api/users", user_1.default);
+app.use("/api/message", message_1.default);
+app.get("/", (req, res) => {
+    res.send("Welcome to the server");
+});
 const startServer = async () => {
     try {
         await dbclient_1.default.$connect();
