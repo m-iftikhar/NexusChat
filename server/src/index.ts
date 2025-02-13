@@ -6,6 +6,8 @@ import fileUpload from "express-fileupload";
 import userRoute from './routes/user';
 import authRoute from './routes/auth';
 import messageRoute from './routes/message';
+import { Server } from 'socket.io';
+import { appMessages } from './sockets/socket';
 const PORT=process.env.PORT || 5000;
 const app:Application=express();
 
@@ -30,8 +32,19 @@ const startServer =async()=>{
         const server=app.listen(PORT,()=>{
             console.log(`server is ruuning on ${PORT}`)
         })
+        const socketIo = new Server(server,{
+            pingTimeout:60000,
+            cors:{
+                origin:["http://localhost:3000"],
+                methods:["GET","POST"]
+            }
+        })
+        socketIo.on("connection",(socket)=>{
+            appMessages(socket,socketIo);
+        })
     } catch (error) {
-        console.error("❌ Error connecting to Prisma:", error);
+        console.error("❌ failed to connect:", error);
+        process.exit(1);
     }
 }
 

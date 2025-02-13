@@ -10,6 +10,8 @@ const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const user_1 = __importDefault(require("./routes/user"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const message_1 = __importDefault(require("./routes/message"));
+const socket_io_1 = require("socket.io");
+const socket_1 = require("./sockets/socket");
 const PORT = process.env.PORT || 5000;
 const app = (0, express_1.default)();
 // middleware
@@ -30,9 +32,20 @@ const startServer = async () => {
         const server = app.listen(PORT, () => {
             console.log(`server is ruuning on ${PORT}`);
         });
+        const socketIo = new socket_io_1.Server(server, {
+            pingTimeout: 60000,
+            cors: {
+                origin: ["http://localhost:3000"],
+                methods: ["GET", "POST"]
+            }
+        });
+        socketIo.on("connection", (socket) => {
+            (0, socket_1.appMessages)(socket, socketIo);
+        });
     }
     catch (error) {
-        console.error("❌ Error connecting to Prisma:", error);
+        console.error("❌ failed to connect:", error);
+        process.exit(1);
     }
 };
 startServer();
