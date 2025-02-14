@@ -36,15 +36,15 @@ export default function Register() {
       reset();
       router.push("/login");
     } catch (error: unknown) {
-      console.error("Signup Error:", error);
-    
-      if (error instanceof Error) {
-        alert(error.message || "Registration failed");
-      } else if (typeof error === "object" && error !== null) {
-        alert(JSON.stringify(error)); // Log full error object if possible
-      } else {
-        alert("An unknown error occurred");
-      }
+  console.error("Signup Error:", error);
+
+  if (error instanceof Error) {
+    alert(error.message || "Registration failed");
+  } else if (typeof error === "object" && error !== null) {
+    alert(JSON.stringify(error)); // Log full error object if possible
+  } else {
+    alert("An unknown error occurred");
+  }
     }
   };
   

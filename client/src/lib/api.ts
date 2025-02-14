@@ -20,12 +20,20 @@ export const chatApi = createApi({
     signup: builder.mutation({
       query: (userData) => ({
         url: "/auth/register",
-        method: "POST", // Fixed: method (not methods)
+        method: "POST", 
         body: userData,
       }),
     }),
+    login: builder.mutation({
+      query: (userData) => ({
+        url: "/auth/login",
+        method: "POST", 
+        body: userData,
+      }),
+    }),
+
   }),
 });
 
-// ✅ Corrected Export
-export const { useSignupMutation } = chatApi;
+
+export const { useSignupMutation ,useLoginMutation} = chatApi;
