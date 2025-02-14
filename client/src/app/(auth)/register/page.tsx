@@ -10,7 +10,7 @@ const page = () => {
       <Register/>
       <p className='text-center'>
         Have an Account ?{" "}
-    <Link href={"/login"} className='text-indigo-500 hover:underline'> Sign in
+    <Link  href={"/login"}className='text-indigo-500 hover:underline'> Sign in
     </Link>
 
       </p>

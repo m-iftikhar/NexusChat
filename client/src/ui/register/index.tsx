@@ -1,22 +1,53 @@
 "use client";
 import React from "react";
-import {useForm} from "react-hook-form"
+import { useForm} from "react-hook-form"
 import { userData } from "../../../types";
 import { useRouter } from "next/navigation";
+import { useSignupMutation } from "@/lib/api";
 export default function Register() {
     const router=useRouter();
+    const [signup, { isLoading }] = useSignupMutation();
+
+
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm();
 
 
-  const onSubmit=async(data:userData)=>{
-       console.log(data,"userdata")
-       router.push("/login")
-  }
+
+  const onSubmit = async (data: userData) => {
+    console.log("Submitting data:", data);
+    try {
+      const formData = new FormData();
+      if (data.name && data.email && data.password && data.profileImage) {
+        formData.append("name", data.name);
+        formData.append("email", data.email);
+        formData.append("password", data.password);
+        formData.append("profileImage", data.profileImage);
+      }
+  
+      const response = await signup(formData).unwrap();
+      console.log("API Response:", response);
+  
+      reset();
+      router.push("/login");
+    } catch (error: unknown) {
+      console.error("Signup Error:", error);
+    
+      if (error instanceof Error) {
+        alert(error.message || "Registration failed");
+      } else if (typeof error === "object" && error !== null) {
+        alert(JSON.stringify(error)); // Log full error object if possible
+      } else {
+        alert("An unknown error occurred");
+      }
+    }
+  };
+  
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
@@ -95,7 +126,7 @@ export default function Register() {
           </p>}
     </div>
 
-      <button type="submit" className="w-full bg-[#2222e6] text-white p-2 rounded hover:bg-[#5151dd]">
+      <button type="submit" disabled={isLoading} className="w-full bg-[#2222e6] text-white p-2 rounded hover:bg-[#5151dd]">
         Register
       </button>
     </form>
