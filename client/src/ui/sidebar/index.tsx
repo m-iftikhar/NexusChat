@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   BellIcon,
@@ -6,8 +8,19 @@ import {
   HomeIcon,
   ChatBubbleLeftEllipsisIcon,
 } from "@heroicons/react/24/solid";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/lib/features/userslice";
 
 const Sidebar = () => {
+  const router=useRouter();
+  const dispatch=useDispatch();
+  const handleLogout=()=>{
+    localStorage.removeItem("token");
+    router.push("/login");
+    dispatch(setUser(null));
+
+  }
   return (
     <div className="w-[100px] h-[95vh] lg:flex flex-col bg-[#2222e6] rounded-lg justify-between  p-4 text-white">
       {/* Top Section (Profile) */}
@@ -26,7 +39,7 @@ const Sidebar = () => {
 
       {/* Bottom Section (Logout) */}
       <div className="flex flex-col items-center pb-4">
-        <ArrowLeftOnRectangleIcon className="w-8 h-8 cursor-pointer hover:text-gray-300" />
+        <ArrowLeftOnRectangleIcon className="w-8 h-8 cursor-pointer hover:text-gray-300" onClick={handleLogout} />
       </div>
     </div>
   );

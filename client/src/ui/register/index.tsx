@@ -27,7 +27,7 @@ export default function Register() {
         formData.append("name", data.name);
         formData.append("email", data.email);
         formData.append("password", data.password);
-        formData.append("profileImage", data.profileImage);
+        formData.append("profileImage", data.profileImage[0]);
       }
   
       const response = await signup(formData).unwrap();

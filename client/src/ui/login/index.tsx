@@ -19,10 +19,10 @@ export default function Login() {
 
       const onSubmit = async (data: userData) => {
         try {
-          console.log("data", data);
+          
           const result=await login(data).unwrap();
           localStorage.setItem("token",result.token);
-          console.log(result,"result");
+          
           dispatch(setUser(result.user));
           reset();
           router.push("/");

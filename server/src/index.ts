@@ -20,6 +20,7 @@ app.use(express.urlencoded({extended:false}));
 app.use("/api/auth",authRoute);
 app.use("/api/users",userRoute);
 app.use("/api/message",messageRoute);
+app.use("/api/files",express.static(path.join("dist/storage")));
 
 app.get("/", (req: express.Request, res: express.Response) => {
     res.send("Welcome to the server");
