@@ -8,6 +8,8 @@ import "dotenv/config";
 import { auth } from "../middleware/user";
 const authRoute = Router(); 
 
+const imagePath=process.env.IMAGES_PATH;
+
 authRoute.post("/register", async (req:any, res:any) => {
     try {
         const { name, email, password } = req.body;
@@ -35,7 +37,7 @@ authRoute.post("/register", async (req:any, res:any) => {
                 name,
                 email,
                 password: hashPassword,
-                profileImage: file ? file.name : undefined,  // Changed `null` to `undefined`
+                profileImage: file ? imagePath + file.name : undefined,  // Changed `null` to `undefined`
             },
         });
 
