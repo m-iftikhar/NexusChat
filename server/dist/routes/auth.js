@@ -11,6 +11,7 @@ const storage_1 = require("../config/storage");
 require("dotenv/config");
 const user_1 = require("../middleware/user");
 const authRoute = (0, express_1.Router)();
+const imagePath = process.env.IMAGES_PATH;
 authRoute.post("/register", async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -34,7 +35,7 @@ authRoute.post("/register", async (req, res) => {
                 name,
                 email,
                 password: hashPassword,
-                profileImage: file ? file.name : undefined, // Changed `null` to `undefined`
+                profileImage: file ? imagePath + file.name : undefined, // Changed `null` to `undefined`
             },
         });
         return res.status(201).json({ message: "User registered successfully", user });

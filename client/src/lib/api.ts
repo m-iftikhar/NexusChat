@@ -1,6 +1,7 @@
 "use client";
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { setError, setUsers,setUser } from "./features/userslice";
 
 export const chatApi = createApi({
   reducerPath: "api",
@@ -31,9 +32,36 @@ export const chatApi = createApi({
         body: userData,
       }),
     }),
+    fetchUsers:builder.query({
+        query:()=>"users/users",
+      async onQueryStarted(arg,{dispatch,queryFulfilled}){
+        try {
+          const {data} = await queryFulfilled;
+          dispatch(setUsers(data));
+        } catch (err) {
+          dispatch(setError(err))
+        
+    
+          
+        }
+      },
+    }),
+    fetchUser: builder.query({
+      query: () => "/users/user",
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          // console.log(data); // Check if this returns user data correctly
+          dispatch(setUser(data));
+        } catch (err) {
+          dispatch(setError(err));
+        }
+      }
+    })
+    
 
   }),
 });
 
 
-export const { useSignupMutation ,useLoginMutation} = chatApi;
+export const { useSignupMutation ,useLoginMutation, useFetchUserQuery, useFetchUsersQuery} = chatApi;

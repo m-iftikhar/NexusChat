@@ -1,38 +1,35 @@
 import React from 'react'
 import Image from 'next/image'
 
-const Chat = () => {
-  const user = {
-    id: 7,
-    name: "Asad",
-    profileImage: "/Assets/userprofile.jpg" 
-  }
+
+const Chat = ({chatUser}) => {
+  
 
   return (
     <div className='w-[90%] h-[80vh] rounded-lg shadow-md shadow-[#79c5ef]'>
       <div className='flex items-center bg-gray-100 border-b border-gray-300 p-4'>
         <div>
-          {user?.profileImage ? (
-            <Image 
-              src={user.profileImage} 
-              alt="User Profile" 
-              width={40}  
-              height={40}
-              className='rounded-full w-12 h-12 object-cover'
-            />
-          ) : (
-            <div className="w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-full text-lg font-bold">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+          {chatUser?.profileImage ? (
+          <Image
+                        src={chatUser?.profileImage.trim() || "/fallback.jpg"}
+                        alt={chatUser?.name}
+                        width={40}
+                        height={40}
+                        className="rounded-full w-12 h-12 object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 flex items-center justify-center bg-purple-600 text-white font-bold rounded-full">
+                        {chatUser?.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
         </div>
         <div className='ml-3'>
         <h2 className='text-lg font-semibold text-gray-800'>
-                 {user?.name}
+                 {chatUser?.name}
         </h2>
-        <p className='text-sm text-gray-500'>
+        {/* <p className='text-sm text-gray-500'>
           Typing....
-        </p>
+        </p> */}
         </div>
       </div>
       <div className='flex flex-col h-full  bg-white'>

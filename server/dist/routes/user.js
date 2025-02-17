@@ -7,7 +7,7 @@ const dbclient_1 = __importDefault(require("../config/dbclient"));
 const express_1 = __importDefault(require("express"));
 const user_1 = require("../middleware/user");
 const userRoute = (0, express_1.default)();
-userRoute.get("/", user_1.auth, async (req, res) => {
+userRoute.get("/users", user_1.auth, async (req, res) => {
     try {
         const users = await dbclient_1.default.user.findMany({
             where: {
