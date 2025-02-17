@@ -8,7 +8,7 @@ const userRoute = Router();
 
 
 
-userRoute.get("/", auth, async (req: any, res: any) => {
+userRoute.get("/users", auth, async (req: any, res: any) => {
     try {
         const users = await prisma.user.findMany({
             where: {
