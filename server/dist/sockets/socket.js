@@ -15,6 +15,12 @@ const addUsers = (socketId, userId) => {
 const removeUser = (socketId) => {
     users = users.filter((user) => user.socketId !== socketId);
 };
+const userLogout = (userId) => {
+    users = users.filter((user) => user.userId !== userId);
+};
+const findFriend = (userId) => {
+    return users?.find((user) => user.userId == userId);
+};
 const appMessages = (socket, socketIo) => {
     socket.on("addUser", (user) => {
         addUsers(socket.id, user.id); // Reversed arguments for addUsers
@@ -22,6 +28,15 @@ const appMessages = (socket, socketIo) => {
         socketIo.emit("getUsers", users); // Emit updated list to all connected clients
         socketIo.emit("activeUsers", users);
         // Optionally, emit the active users list
+        socket.on("sendMessage", (message) => {
+            const user = findFriend(message.receiverId);
+            if (user) {
+                socketIo.to(user.socketId).emit('newMessage', message);
+            }
+        });
+        socket.on("logout", (userId) => {
+            userLogout(userId);
+        });
         socket.on("disconnect", () => {
             setTimeout(() => {
                 if (socket.connected) {

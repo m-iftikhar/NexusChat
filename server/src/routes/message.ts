@@ -34,12 +34,19 @@ messageRoute.post("/create",auth,async(req:any,res:any)=>{
 
 messageRoute.get("/",auth,async(req:any,res:any)=>{
     try {
+        console.log("Query Params:", req.query);
+
         const {senderId}=req.query;
+      
         const userId=req?.user?.id;
+        
+
+console.log("Sender ID:", senderId, "User ID:", userId);
+
         if(!userId){
             return res.status(401).json({error:"Unauthorized"});
         }
-        const message= await prisma.message.findMany({
+        const messages= await prisma.message.findMany({
             where:{
                 OR:[
                     {senderId:Number(userId),receiverId:Number(senderId)},
@@ -51,7 +58,7 @@ messageRoute.get("/",auth,async(req:any,res:any)=>{
                 receiver: true // Relation "ReceivedMessages"
             }
         });
-        res.json(message);
+        res.json(messages);
         
     } catch (error:any) {
         res.status(500).json({message:error?.message})

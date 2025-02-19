@@ -1,3 +1,4 @@
+import { Socket } from "dgram";
 
 
 let users: any[] = [];
@@ -16,6 +17,12 @@ const addUsers = (socketId: string, userId: string) => {
 const removeUser = (socketId: any) => { // Corrected parameter name
     users = users.filter((user) => user.socketId !== socketId);
 }
+const userLogout = (userId: any) => { // Corrected parameter name
+    users = users.filter((user) => user.userId !== userId);
+}
+const findFriend=(userId:string)=>{
+    return users?.find((user)=> user.userId == userId)
+}
 
 export const appMessages = (socket: any, socketIo: any) => {
     socket.on("addUser", (user: any) => {
@@ -25,6 +32,15 @@ export const appMessages = (socket: any, socketIo: any) => {
         socketIo.emit("getUsers", users); // Emit updated list to all connected clients
         socketIo.emit("activeUsers", users);
          // Optionally, emit the active users list
+      socket.on("sendMessage",(message:any)=>{
+        const user=findFriend(message.receiverId)
+        if(user){
+            socketIo.to(user.socketId).emit('newMessage',message)
+        }
+      })
+         socket.on("logout",(userId:any)=>{
+            userLogout(userId);
+         })
          socket.on("disconnect",()=>{
             setTimeout(()=>{
                 if(socket.connected){

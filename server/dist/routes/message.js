@@ -34,12 +34,14 @@ messageRoute.post("/create", user_1.auth, async (req, res) => {
 // get message
 messageRoute.get("/", user_1.auth, async (req, res) => {
     try {
+        console.log("Query Params:", req.query);
         const { senderId } = req.query;
         const userId = req?.user?.id;
+        console.log("Sender ID:", senderId, "User ID:", userId);
         if (!userId) {
             return res.status(401).json({ error: "Unauthorized" });
         }
-        const message = await dbclient_1.default.message.findMany({
+        const messages = await dbclient_1.default.message.findMany({
             where: {
                 OR: [
                     { senderId: Number(userId), receiverId: Number(senderId) },
@@ -51,7 +53,7 @@ messageRoute.get("/", user_1.auth, async (req, res) => {
                 receiver: true // Relation "ReceivedMessages"
             }
         });
-        res.json(message);
+        res.json(messages);
     }
     catch (error) {
         res.status(500).json({ message: error?.message });

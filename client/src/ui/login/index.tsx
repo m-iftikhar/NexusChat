@@ -5,10 +5,12 @@ import {useForm} from "react-hook-form";
 import { userData } from "../../../types";
 import { useDispatch} from "react-redux";
 import { setUser } from "@/lib/features/userslice";
+import { useFetchUsersQuery } from "@/lib/api";
 export default function Login() {
  
     const [login, { isLoading }] = useLoginMutation();
      const dispatch=useDispatch();
+     const {refetch} = useFetchUsersQuery("");
      const router=useRouter();
      const {
         register,
@@ -24,6 +26,7 @@ export default function Login() {
           localStorage.setItem("token",result.token);
           
           dispatch(setUser(result.user));
+          refetch?.();
           reset();
           router.push("/");
           

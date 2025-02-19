@@ -9,12 +9,12 @@ import {
   ChatBubbleLeftEllipsisIcon,
 } from "@heroicons/react/24/solid";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { setUser } from "@/lib/features/userslice";
 
 
-const Sidebar = ({user}) => {
+
+
+
+const Sidebar = ({user,handleLogout}:any) => {
  
   // Utility function to check if the URL is valid
 const isValidUrl = (url) => {
@@ -25,14 +25,14 @@ const isValidUrl = (url) => {
     return false;
   }
 };
-  const router = useRouter();
-  const dispatch = useDispatch();
+  // const router = useRouter();
+  // const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    dispatch(setUser(null));
-    router.push("/login");
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   dispatch(setUser(null));
+  //   router.push("/login");
+  // };
   if (!user) {
     return <div>Loading...</div>;
   }
