@@ -28,7 +28,7 @@ model Message {
   id         Int      @id @default(autoincrement())
   content    String
   createdAt  DateTime @default(now())
-
+  
   senderId   Int
   sender     User     @relation("SentMessages", fields: [senderId], references: [id])
 
