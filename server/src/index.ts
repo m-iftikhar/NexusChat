@@ -15,7 +15,13 @@ const app:Application=express();
 // middleware
 app.use(cors());
 app.use(express.json({limit:"1gb"}));
-app.use(fileUpload());
+
+app.use(fileUpload({
+  useTempFiles: true,    // Enables temporary file storage
+  tempFileDir: "/tmp/",  // Temp directory for uploaded files
+  limits: { fileSize: 10 * 1024 * 1024 } // Limit to 10MB
+}));
+
 app.use(express.urlencoded({extended:false}));
 app.use("/api/auth",authRoute);
 app.use("/api/users",userRoute);

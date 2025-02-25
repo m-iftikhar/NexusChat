@@ -115,8 +115,8 @@ export default function Home() {
         }
         
       };
-      const sendMessageHandler = async (event) => {
-        event.preventDefault();
+      const sendMessageHandler = async (e) => {
+        e.preventDefault();
         if (!message) {
             return alert("Please enter a message.");
         }

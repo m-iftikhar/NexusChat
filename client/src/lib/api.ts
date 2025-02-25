@@ -67,12 +67,33 @@ export const chatApi = createApi({
       },
     }),
     addMessage: builder.mutation({
-      query: (data) => ({
-        url: "/message/create",
-        method: "POST",
-        body: data,
-      }),
+      query: (data) => {
+        const formData = new FormData();
+        
+        formData.append("receiverId", data.receiverId);
+        formData.append("content", data.content);
+    
+        if (data.image) {
+          formData.append("image", data.image);  // Ensure it's a `File` object
+        }
+        if (data.audio) {
+          formData.append("audio", data.audio);
+        }
+        if (data.video) {
+          formData.append("video", data.video);
+        }
+        if (data.file) {
+          formData.append("file", data.file);
+        }
+    
+        return {
+          url: "/message/create",
+          method: "POST",
+          body: formData,
+        };
+      },
     }),
+    
   }),
 });
 

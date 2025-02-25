@@ -28,12 +28,15 @@ model Message {
   id         Int      @id @default(autoincrement())
   content    String
   createdAt  DateTime @default(now())
-  image      String?
+  image      String?  // Image URL (Optional)
+  audio      String?  // Audio file URL (Optional)
+  video      String?  // Video file URL (Optional)
+  file       String?  // General file URL (Optional)
   senderId   Int
   sender     User     @relation("SentMessages", fields: [senderId], references: [id])
 
-  receiverId Int  // ❌ Removed "model"
-  receiver   User @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId Int
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
 }
 
 

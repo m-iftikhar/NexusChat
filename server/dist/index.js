@@ -18,7 +18,11 @@ const app = (0, express_1.default)();
 // middleware
 app.use((0, cors_1.default)());
 app.use(express_1.default.json({ limit: "1gb" }));
-app.use((0, express_fileupload_1.default)());
+app.use((0, express_fileupload_1.default)({
+    useTempFiles: true, // Enables temporary file storage
+    tempFileDir: "/tmp/", // Temp directory for uploaded files
+    limits: { fileSize: 10 * 1024 * 1024 } // Limit to 10MB
+}));
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use("/api/auth", auth_1.default);
 app.use("/api/users", user_1.default);
