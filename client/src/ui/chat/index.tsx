@@ -3,8 +3,12 @@ import Image from "next/image";
 
 const Chat = ({ chatUser, messages, user, sendMessageHandler, message, setMessage }) => {
   const messagesEndRef = useRef(null);
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState("");
+  const [media, setMedia] = useState({ image: null, audio: null, video: null, file: null });
+  const [preview, setPreview] = useState({ image: "", audio: "", video: "", file: "" });
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioStream, setAudioStream] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [audioUrl, setAudioUrl] = useState(null);
 
   const dateFormat = (timestamp) => {
     const date = new Date(timestamp);
@@ -19,35 +23,70 @@ const Chat = ({ chatUser, messages, user, sendMessageHandler, message, setMessag
     scrollToBottom();
   }, [messages]);
 
-  const handleImageSelect = (e) => {
+  const handleFileSelect = (e, type) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setPreview(reader.result);
-        setImage(reader.result);
+        setPreview((prev) => ({ ...prev, [type]: reader.result }));
+        setMedia((prev) => ({ ...prev, [type]: reader.result }));
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleStartRecording = () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then((stream) => {
+          const mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+
+          mediaRecorder.ondataavailable = (e) => {
+            setAudioBlob(e.data);
+            setAudioUrl(URL.createObjectURL(e.data));
+          };
+
+          mediaRecorder.onstop = () => {
+            setAudioStream(null);
+          };
+
+          setAudioStream(mediaRecorder);
+          setIsRecording(true);
+        })
+        .catch((error) => console.error("Error accessing audio:", error));
+    } else {
+      alert("Audio recording is not supported in your browser.");
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (audioStream) {
+      audioStream.stop();
+      setIsRecording(false);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(e)
-    if (message.trim() || image) {
+    if (message.trim() || media.image || media.audio || media.video || media.file) {
       sendMessageHandler({
         content: message,
-        image: image
+        image: media.image,
+        audio: audioBlob ? audioBlob : media.audio,
+        video: media.video,
+        file: media.file,
       });
       setMessage("");
-      setImage(null);
-      setPreview("");
+      setMedia({ image: null, audio: null, video: null, file: null });
+      setPreview({ image: "", audio: "", video: "", file: "" });
+      setAudioBlob(null);
+      setAudioUrl(null);
     }
   };
 
   return (
     <div className="w-[90%] h-[80vh] rounded-lg shadow-md shadow-[#79c5ef]">
-      {/* Chat Header */}
       <div className="flex items-center bg-gray-100 border-b border-gray-300 p-4">
         <div>
           {chatUser?.profileImage ? (
@@ -69,7 +108,6 @@ const Chat = ({ chatUser, messages, user, sendMessageHandler, message, setMessag
         </div>
       </div>
 
-      {/* Chat Body */}
       <div className="flex overflow-auto flex-col h-full bg-white">
         <div className="flex-1 overflow-auto p-4 space-y-4">
           {messages?.length > 0 ? (
@@ -86,18 +124,13 @@ const Chat = ({ chatUser, messages, user, sendMessageHandler, message, setMessag
                         : "bg-blue-500 text-white"
                     } p-3 rounded-lg break-words`}
                   >
-                    {msg?.image && (
-                      <img 
-                        src={msg.image} 
-                        alt="Chat content" 
-                        className="w-full max-h-48 object-cover rounded-lg mb-2"
-                      />
-                    )}
+                    {msg?.image && <img src={msg.image} alt="Chat content" className="w-full max-h-48 object-cover rounded-lg mb-2" />}
+                    {msg?.audio && <audio controls src={msg.audio} className="w-full mb-2" />}
+                    {msg?.video && <video controls src={msg.video} className="w-full max-h-48 rounded-lg mb-2" />}
+                    {msg?.file && <a href={msg.file} target="_blank" rel="noopener noreferrer " className="text-blue-500 hover:text-blue-700 underline">Download File</a>}
                     {msg?.content}
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {dateFormat(msg?.createdAt)}
-                  </span>
+                  <span className="text-xs text-gray-500">{dateFormat(msg?.createdAt)}</span>
                 </div>
               </div>
             ))
@@ -107,53 +140,50 @@ const Chat = ({ chatUser, messages, user, sendMessageHandler, message, setMessag
           <div ref={messagesEndRef}></div>
         </div>
 
-        {/* Chat Input */}
         <div className="p-4 bg-white shadow-lg rounded-md">
           <div className="bg-white p-2 rounded-md border border-gray-400">
-            {preview && (
-              <div className="mb-2 relative">
-                <img 
-                  src={preview} 
-                  alt="Preview" 
-                  className="w-16 h-16 object-cover rounded-lg"
-                />
-                <button
-                  onClick={() => {
-                    setPreview("");
-                    setImage(null);
-                  }}
-                  className="absolute top-0 right-0 bg-gray-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
-                >
-                  ×
-                </button>
-              </div>
+            {Object.keys(preview).map((type) =>
+              preview[type] ? (
+                <div key={type} className="mb-2 relative">
+                  {type === "image" && <img src={preview.image} alt="Preview" className="w-16 h-16 object-cover rounded-lg" />}
+                  {type === "audio" && <audio controls src={preview.audio} className="w-full" />}
+                  {type === "video" && <video controls src={preview.video} className="w-16 h-16 object-cover rounded-lg" />}
+                  {type === "file" && <a href={preview.file} target="_blank" rel="noopener noreferrer">Preview File</a>}
+                  <button
+                    onClick={() => {
+                      setPreview((prev) => ({ ...prev, [type]: "" }));
+                      setMedia((prev) => ({ ...prev, [type]: null }));
+                    }}
+                    className="absolute top-0 right-0 bg-gray-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : null
             )}
             <form onSubmit={handleSubmit} className="flex items-center">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                className="hidden"
-                id="image-upload"
-              />
-              <label
-                htmlFor="image-upload"
-                className="cursor-pointer mr-2 text-gray-600 hover:text-gray-800"
-              >
-                📎
-              </label>
-              <input
-                onChange={(e) => setMessage(e.target.value)}
-                value={message}
-                className="flex-1 focus:outline-none px-2 py-1"
-                placeholder="Type a message..."
-              />
+              <input type="file" accept="image/*" onChange={(e) => handleFileSelect(e, "image")} className="hidden" id="image-upload" />
+              <input type="file" accept="audio/*" onChange={(e) => handleFileSelect(e, "audio")} className="hidden" id="audio-upload" />
+              <input type="file" accept="video/*" onChange={(e) => handleFileSelect(e, "video")} className="hidden" id="video-upload" />
+              <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => handleFileSelect(e, "file")} className="hidden" id="file-upload" />
+
+              <label htmlFor="image-upload" className="cursor-pointer mr-2">📷</label>
+              <label htmlFor="audio-upload" className="cursor-pointer mr-2">🎵</label>
+              <label htmlFor="video-upload" className="cursor-pointer mr-2">🎥</label>
+              <label htmlFor="file-upload" className="cursor-pointer mr-2">📂</label>
+
               <button
-                type="submit"
-                className="ml-2 bg-[#2222e6] hover:bg-[#6363cc] text-white px-4 py-2 rounded-lg"
+                type="button"
+                onClick={isRecording ? handleStopRecording : handleStartRecording}
+                className={`mr-2 ${isRecording ? "bg-red-500" : "bg-green-500"} text-white px-3 py-2 rounded-full`}
               >
-                Send
+                {isRecording ? "Stop Recording" : "Record Audio"}
               </button>
+
+              {audioUrl && <audio controls src={audioUrl} className="mr-2" />}
+
+              <input onChange={(e) => setMessage(e.target.value)} value={message} className="flex-1 focus:outline-none px-2 py-1" placeholder="Type a message..." />
+              <button type="submit" className="ml-2 bg-[#2222e6] hover:bg-[#6363cc] text-white px-4 py-2 rounded-lg">Send</button>
             </form>
           </div>
         </div>
