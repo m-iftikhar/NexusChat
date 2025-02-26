@@ -115,32 +115,33 @@ export default function Home() {
         }
         
       };
-      const sendMessageHandler = async (e) => {
-        e.preventDefault();
-        if (!message) {
-            return alert("Please enter a message.");
+      const sendMessageHandler = async (data) => {
+        // Validate if there's content or media
+        if (!data.content && !data.image && !data.audio && !data.video && !data.file) {
+            return alert("Please enter a message or attach a file.");
         }
-        const data = {
-            content: message,
+        
+        // Construct the message data with additional fields
+        const messageData = {
+            ...data,
             createdAt: new Date().toISOString(),
             senderId: user?.id,
             receiverId: chatUser?.id
         };
+    
         try {
-            const result = await addMessage(data).unwrap();
-            if(socket.current){
-                socket.current.emit("sendMessage",data)
+            const result = await addMessage(messageData).unwrap();
+            if (socket.current) {
+                socket.current.emit("sendMessage", messageData);
             }
-            // Optionally, you can check the result here
             dispatch(addLocalMessage(result));
-            setMessage(""); // Clear the input field after sending
+            setMessage(""); // Clear the input field
         } catch (error) {
-            console.error('Failed to send message:', error);
-            // Handle the error appropriately
-        }
+            console.error('Full error:', error);
+            console.error('Backend response:', error.data);
+            alert(`Error: ${error.data?.message || 'Check console for details'}`);
+          }
     };
-    
-    
 
     return (
         <div className="p-[20px] bg-slate-200">

@@ -26,12 +26,11 @@ const Chat = ({ chatUser, messages, user, sendMessageHandler, message, setMessag
   const handleFileSelect = (e, type) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreview((prev) => ({ ...prev, [type]: reader.result }));
-        setMedia((prev) => ({ ...prev, [type]: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      setMedia(prev => ({ ...prev, [type]: file })); // ✅ Store File object
+      setPreview(prev => ({ 
+        ...prev, 
+        [type]: URL.createObjectURL(file) // ✅ Create preview URL
+      }));
     }
   };
 
@@ -67,23 +66,28 @@ const Chat = ({ chatUser, messages, user, sendMessageHandler, message, setMessag
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (message.trim() || media.image || media.audio || media.video || media.file) {
-      sendMessageHandler({
-        content: message,
-        image: media.image,
-        audio: audioBlob ? audioBlob : media.audio,
-        video: media.video,
-        file: media.file,
-      });
-      setMessage("");
-      setMedia({ image: null, audio: null, video: null, file: null });
-      setPreview({ image: "", audio: "", video: "", file: "" });
-      setAudioBlob(null);
-      setAudioUrl(null);
+    try {
+        if (message.trim() || media.image || media.audio || media.video || media.file) {
+            await sendMessageHandler({
+                content: message,
+                image: media.image,
+                audio: audioBlob ? audioBlob : media.audio,
+                video: media.video,
+                file: media.file,
+            });
+            setMessage("");
+            setMedia({ image: null, audio: null, video: null, file: null });
+            setPreview({ image: "", audio: "", video: "", file: "" });
+            setAudioBlob(null);
+            setAudioUrl(null);
+        }
+    } catch (error) {
+        console.error("Error sending message:", error);
     }
-  };
+};
+
 
   return (
     <div className="w-[90%] h-[80vh] rounded-lg shadow-md shadow-[#79c5ef]">
