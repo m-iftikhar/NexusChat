@@ -12,16 +12,16 @@ const messageRoute = (0, express_1.default)();
 // POST route to create a message with file (image, audio, or video)
 messageRoute.post("/create", user_1.auth, async (req, res) => {
     try {
-        console.log("Received Files:", req.files);
-        if (!req.files) {
-            return res.status(400).json({ error: "No files uploaded" });
-        }
+        // console.log("Received Files:", req.files);
+        // if (!req.files) {
+        //   return res.status(400).json({ error: "No files uploaded" });
+        // }
         const { receiverId, content, image, audio, video, file } = req.body;
         const userId = req?.user?.id;
         if (!userId) {
             return res.status(401).json({ error: "Unauthorized" });
         }
-        if (!receiverId || !content) {
+        if (!receiverId) {
             return res.status(400).json({ error: "Receiver ID and content are required" });
         }
         let imageUrl = null;
